@@ -3,7 +3,7 @@ $:.push File.expand_path("../lib", __FILE__)
 require "suitcase/version"
 
 Gem::Specification.new do |s|
-  s.name        = "rthbound-suitcase"
+  s.name        = "suitcase"
   s.version     = Suitcase::VERSION
   s.authors     = ["Walter Nelson", "Tad Hosford"]
   s.email       = ["tad@isotope11.com"]
