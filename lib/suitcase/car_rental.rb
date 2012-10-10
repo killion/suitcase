@@ -14,7 +14,10 @@ module Suitcase
       def find(info)
         parsed = parse_json(build_url(info))
         parse_errors(parsed)
-        parsed["MetaData"]["CarMetaData"]["CarTypes"].map { |data| CarRental.new(data) }
+
+        parsed["MetaData"]["CarMetaData"]["CarTypes"].map do |data|
+          CarRental.new(data)
+        end
       end
 
       def build_url(info)
@@ -30,6 +33,7 @@ module Suitcase
         info["pickuptime"] = info.delete(:pickup_time)
         info["dropofftime"] = info.delete(:dropoff_time)
         base_url += "?" + parameterize(info)
+
         URI.parse(URI.escape(base_url))
       end
 
@@ -44,7 +48,9 @@ module Suitcase
       end
 
       def parse_errors(parsed)
-        parsed["Errors"].each { |e| raise e } if parsed["Errors"] && !parsed["Errors"].empty?
+        if parsed["Errors"] && !parsed["Errors"].empty?
+          parsed["Errors"].each { |e| raise e }
+        end
       end
     end
   end
