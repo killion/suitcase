@@ -1,11 +1,12 @@
 require "bundler/gem_tasks"
-require "rspec/core/rake_task"
+require "rake/testtask"
 
-task :default => :spec
-
-RSpec::Core::RakeTask.new(:spec) do |t|
-  t.rspec_opts = %w(-c --fail-fast --format d)
+Rake::TestTask.new do |t|
+  t.pattern = 'test/**/*_test.rb'
+  t.libs.push 'test'
 end
+
+task :default => :test
 
 task :install_nodoc => [:build] do
   system "gem install pkg/suitcase-#{Suitcase::VERSION}.gem --no-ri --no-rdoc"
