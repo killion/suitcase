@@ -15,6 +15,22 @@ describe Suitcase::Hotel do
     end
   end
 
+  describe "parsed JSON instantiates a proper Suitcase::Hotel" do
+    before :all do
+      @parsed_hotel = Suitcase::Hotel.new(Suitcase::Hotel.parse_information(Keys::HOTEL_DETAILS))
+    end
+    
+    Keys::HOTEL_DETAILS_MAP.each do |field,value|
+      it "should parse the #{field} field" do
+        if value.is_a? Array
+          @parsed_hotel.send(field).size.must_equal value.size
+        else
+          @parsed_hotel.send(field).must_equal value
+        end
+      end
+    end
+  end
+
   describe ".find" do
     it "returns a single Hotel if passed an ID" do
       @hotel.must_be_kind_of(Suitcase::Hotel)
