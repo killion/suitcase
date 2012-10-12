@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < Hashie::Trash
     # Public: A BedType represents a bed configuration for a Room.
     class BedType
       # Internal: The ID of the BedType.

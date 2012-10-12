@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < Hashie::Trash
     class Cancellation
       extend Helpers
       include Helpers
