@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < Hashie::Trash
     class PaymentOption
       attr_accessor :code, :name
 

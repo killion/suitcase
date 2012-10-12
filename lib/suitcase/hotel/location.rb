@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < Hashie::Trash
     class Location
       attr_accessor :destination_id, :type, :active, :city, :province,
                     :country, :country_code
