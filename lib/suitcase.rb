@@ -6,6 +6,8 @@ require "date/format"
 require "time"
 require "hashie"
 
+require "suitcase/translated_hash"
+
 require "suitcase/version"
 
 require "suitcase/core_ext/string"
