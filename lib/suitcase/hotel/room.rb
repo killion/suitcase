@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel < Hashie::Trash
+  class Hotel
     class Room
       attr_accessor :rate_key, :hotel_id, :supplier_type, :rate_code,
                     :room_type_code, :supplier_type, :tax_rate, :non_refundable,

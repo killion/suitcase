@@ -1,5 +1,5 @@
 module Suitcase
-  class Image < Hashie::Trash
+  class Image
     attr_accessor :id, :url, :caption, :width, :height, :thumbnail_url, :name
 
     def initialize(data)
