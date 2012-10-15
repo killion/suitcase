@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < TranslatedHash
     class PaymentOption
       attr_accessor :code, :name
 

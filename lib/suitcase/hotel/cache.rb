@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < TranslatedHash
     class Cache
       attr_accessor :store
 

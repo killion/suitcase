@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < TranslatedHash
     class Reservation
       attr_accessor :itinerary_id, :confirmation_numbers, :raw, :surcharges
 
