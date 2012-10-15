@@ -10,7 +10,10 @@ require "suitcase/hotel/nightly_rate"
 require "suitcase/hotel/payment_option"
 require "suitcase/hotel/reservation"
 require "suitcase/hotel/room"
+require "suitcase/hotel/room_amenity"
+require "suitcase/hotel/room_type"
 require "suitcase/hotel/surcharge"
+require "suitcase/hotel/supplier"
 require "suitcase/hotel/cancellation"
 
 module Suitcase
@@ -41,10 +44,14 @@ module Suitcase
       end
     }
     translate "HotelInformationResponse.HotelSummary.amenityMask", :into => :amenity_mask
+    translate "HotelInformationResponse.HotelDetails.areaInformation", :into => :area_information
     translate "HotelInformationResponse.HotelDetails.checkInInstructions", :into => :checkin_instructions
+    translate "HotelInformationResponse.HotelDetails.checkInTime", :into => :check_in_time
+    translate "HotelInformationResponse.HotelDetails.checkOutTime", :into => :check_out_time
     translate "HotelInformationResponse.HotelSummary.city", :into => :city
     translate "HotelInformationResponse.HotelSummary.countryCode", :into => :country_code
     translate "HotelInformationResponse.HotelSummary.deepLink", :into => :deep_link
+    translate "HotelInformationResponse.HotelDetails.drivingDirections", :into => :driving_directions
     translate "HotelInformationResponse.HotelDetails.hotelPolicy", :into => :general_policies
     translate "HotelInformationResponse.HotelSummary.highRate", :into => :high_rate
     translate "HotelInformationResponse.HotelSummary.hotelId", :into => :id
@@ -60,10 +67,26 @@ module Suitcase
     translate "HotelInformationResponse.HotelSummary.stateProvinceCode", :into => :province
     translate "HotelInformationResponse.HotelSummary.propertyCategory", :into => :property_category, :using => lambda { |property_category| property_category.to_i }
     translate "HotelInformationResponse.HotelDetails.propertyDescription", :into => :property_description
+    translate "HotelInformationResponse.HotelDetails.propertyInformation", :into => :property_information
     translate "HotelInformationResponse.HotelSummary.proximityDistance", :into => :proximity_distance_original
     translate "HotelInformationResponse.HotelSummary.proximityUnit", :into => :proximity_unit_original
     translate "HotelInformationResponse.HotelSummary.hotelRating", :into => :rating
+    translate "HotelInformationResponse.HotelDetails.roomInformation", :into => :room_information
+    translate "HotelInformationResponse.RoomTypes.RoomType", :into => :room_types, :using => lambda { |room_types| 
+      room_types.map do |room_type|
+        Suitcase::Hotel::RoomType.new(:description => room_type["description"],
+          :description_long => room_type["descriptionLong"],
+          :room_amenities => room_type["roomAmenities"]["RoomAmenity"],
+          :room_code => room_type["@roomCode"], 
+          :room_type_id => room_type["@roomTypeId"])
+      end
+    }
     translate "HotelInformationResponse.HotelSummary.shortDescription", :into => :short_description
+    translate "HotelInformationResponse.Suppliers.Supplier", :into => :suppliers, :using => lambda { |suppliers| 
+      suppliers.map do |supplier|
+        Suitcase::Hotel::Supplier.new(id: supplier["@id"], chain_code: supplier["@chainCode"])
+      end
+    }
     translate "HotelInformationResponse.HotelSummary.tripAdvisorRating", :into => :tripadvisor_rating
     translate "HotelInformationResponse.HotelSummary.tripAdvisorRatingUrl", :into => :tripadvisor_rating_url
     translate "HotelInformationResponse.HotelSummary.tripAdvisorReviewCount", :into => :tripadvisor_review_count
