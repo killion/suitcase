@@ -6,7 +6,7 @@ module Suitcase
   #
   #   parameterize(something: "else", another: "thing")
   #   # => "something=else&another=thing"
-  class Hotel
+  class Hotel < TranslatedHash
     module Helpers
       # Internal: Defaults for the builder options to Helpers#url.
       URL_DEFAULTS = {

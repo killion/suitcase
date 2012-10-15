@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < TranslatedHash
     class Cancellation
       extend Helpers
       include Helpers

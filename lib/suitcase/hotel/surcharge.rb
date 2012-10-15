@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel
+  class Hotel < TranslatedHash
     # Public: A Surcharge represents a single surcharge on a Room.
     class Surcharge
       attr_accessor :amount, :type
