@@ -54,7 +54,7 @@ module Keys
   HOTEL_DETAILS_MAP[:amenities] = parsed["HotelInformationResponse"]["PropertyAmenities"]["PropertyAmenity"].map do |x|
     Suitcase::Hotel::Amenity.new(id: x["amenityId"], description: x["amenity"])
   end
-  if images = Suitcase::Hotel.images(parsed)
+  if images = Suitcase::Hotel.parse_images(parsed)
     HOTEL_DETAILS_MAP[:images] = images
   end
   
