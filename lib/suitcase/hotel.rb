@@ -18,6 +18,7 @@ module Suitcase
   #         all Hotel EAN-related queries in the gem.
   class Hotel < Hashie::Trash
     extend Helpers
+    include Hashie::Extensions::StringifyKeys
 
     # Public: The Amenities that can be passed in to searches, and are returned
     #         from many queries.
@@ -32,17 +33,57 @@ module Suitcase
       wheelchair_accessible: 8,
       kitchen: 9
     }
+    
+    def self.property( name, options )
+    end
+    
+    # The following are heavily used to derive all the other properties
+    property :root, :from => :HotelInformationResponse
+    property :summary, :from => :root, :with => lambda{ |root| root["HotelSummary"] }
+    
+    # Actual hotel properties
+    property :address, :from => :summary, :with => lambda{ |summary| summary["address1"] }
+    property :airport_code, :from => :summary, :with => lambda{ |summary| summary["airportCode"] }
+    # property :amenities, :from => :root, :with => lambda { |root|
+    #   root["PropertyAmenities"]["PropertyAmenity"].map do |property_amenity|
+    #     Suitcase::Hotel::Amenity.new(id: property_amenity["amenityId"], description: property_amenity["amenity"])
+    #   end
+    # }
+    # property :amenity_mask, :from => :summary, :with => lambda{ |summary| summary["amenityMask"] }
+    # property :checkin_instructions, :from => :hotel_details, :with => lambda{ |hotel_details| hotel_details["checkInInstructions"] }
+    # property :city
+    # property :country_code, :from => :summary, :with => lambda{ |summary| summary["countryCode"] }
+    # property :deep_link, :from => :summary, :with => lambda{ |summary| summary["deepLink"] }
+    # property :general_policies, :from => :hotel_details, :with => lambda{ |hotel_details| hotel_details["hotelPolicy"] }
+    # property :high_rate, :from => :summary, :with => lambda{ |summary| summary["highRate"] }
+    # property :hotel_details, :from  => :HotelDetails 
+    # property :id, :from => :summary, :with => lambda{ |summary| summary["hotelId"] }
+    property :images
+    # property :latitude, :transform_with => lambda { |latitude| latitude.to_f }
+    # property :location_description, :from => :summary, :with => lambda{ |summary| summary["locationDescription"] }
+    # property :longitude, :transform_with => lambda { |longitude| longitude.to_f }
+    # property :low_rate, :from => :summary, :with => lambda{ |summary| summary["lowRate"] }
+    # property :masked_amenities, :from => :amenityMask, :with => lambda { |amenityMask| Suitcase::Hotel::Amenity.parse_mask(amenityMask) }
+    # property :name
+    # #property :number_of_rooms, :from => :root, :with => lambda { |root| root["HotelDetails"]["numberOfRooms"] }
+    # #property :number_of_floors, :from => :root, :with => lambda { |root| root["HotelDetails"]["numberOfFloors"] }
+    # property :postal_code, :from => :summary, :with => lambda{ |summary| summary["postalCode"] }
+    # property :province, :from => :summary, :with => lambda{ |summary| summary["stateProvinceCode"] }
+    # property :property_category, :transform_with => lambda { |property_category| property_category.to_i }
+    # #property :property_description, :from => :root, :with => lambda { |root| root["HotelDetails"]["propertyDescription"] }
+    # property :proximity_distance_original, :from => :summary, :with => lambda{ |summary| summary["proximityDistance"] }
+    # property :proximity_unit_original, :from => :summary, :with => lambda{ |summary| summary["proximityUnit"] }
+    # property :rating, :from => :summary, :with => lambda{ |summary| summary["hotelRating"] }
+    # property :short_description, :from => :summary, :with => lambda{ |summary| summary["shortDescription"] }
+    # property :tripadvisor_rating, :from => :summary, :with => lambda{ |summary| summary["tripAdvisorRating"] }
+    # property :tripadvisor_rating_url, :from => :summary, :with => lambda{ |summary| summary["tripAdvisorRatingUrl"] }
+    # property :tripadvisor_review_count, :from => :summary, :with => lambda{ |summary| summary["tripAdvisorReviewCount"] }
+    
+    def proximity_distance
+      proximity_distance_original.to_s + proximity_unit_original.to_s
+    end
 
-    attr_accessor :id, :name, :address, :city, :province, :amenities,
-                  :masked_amenities, :country_code, :high_rate, :low_rate,
-                  :longitude, :latitude, :rating, :postal_code, :supplier_type,
-                  :images, :nightly_rate_total, :airport_code,
-                  :property_category, :confidence_rating, :amenity_mask,
-                  :location_description, :short_description,
-                  :hotel_in_destination, :proximity_distance,
-                  :property_description, :number_of_floors, :number_of_rooms,
-                  :deep_link, :tripadvisor_rating, :tripadvisor_rating_url, :tripadvisor_review_count, :general_policies,
-                  :checkin_instructions, :general_policies, :raw
+    attr_accessor :confidence_rating, :hotel_in_destination, :nightly_rate_total, :raw, :supplier_type
 
     # Internal: Initialize a new Hotel.
     #
@@ -50,9 +91,11 @@ module Suitcase
     #
     # Returns a new Hotel object with the passed-in attributes.
     def initialize(info)
-      info.each do |k, v|
-        send (k.to_s + "=").to_sym, v
-      end
+      super(info)
+      self.images = self.class.parse_images(info)
+      # info.each do |k, v|
+      #   send (k.to_s + "=").to_sym, v
+      # end
     end
 
     # Public: Find a Hotel based on ID, IDs, or location (and other options).
@@ -240,7 +283,7 @@ module Suitcase
       parsed_info[:amenities] = parsed["HotelInformationResponse"]["PropertyAmenities"]["PropertyAmenity"].map do |x|
         Amenity.new(id: x["amenityId"], description: x["amenity"])
       end if parsed["HotelInformationResponse"]
-      parsed_info[:images] = images(parsed) if images(parsed)
+      parsed_info[:images] = parse_images(parsed) if parse_images(parsed)
       if parsed["HotelInformationResponse"]
         parsed_info[:property_description] = parsed["HotelInformationResponse"]["HotelDetails"]["propertyDescription"]
         parsed_info[:number_of_rooms] = parsed["HotelInformationResponse"]["HotelDetails"]["numberOfRooms"]
@@ -261,7 +304,7 @@ module Suitcase
     # parsed - A Hash representing the parsed JSON.
     #
     # Returns an Array of Image.
-    def self.images(parsed)
+    def self.parse_images(parsed)
       images = parsed["HotelInformationResponse"]["HotelImages"]["HotelImage"].map do |image_data|
         Suitcase::Image.new(image_data)
       end if parsed["HotelInformationResponse"] && parsed["HotelInformationResponse"]["HotelImages"] && parsed["HotelInformationResponse"]["HotelImages"]["HotelImage"]
