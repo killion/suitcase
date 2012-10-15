@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel < Hashie::Trash
+  class Hotel
     class Amenity
       attr_accessor :id, :description
 

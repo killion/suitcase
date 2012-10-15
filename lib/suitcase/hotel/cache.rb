@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel < Hashie::Trash
+  class Hotel
     class Cache
       attr_accessor :store
 

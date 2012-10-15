@@ -27,5 +27,4 @@ Gem::Specification.new do |s|
 
   s.add_runtime_dependency "json"
   s.add_runtime_dependency "patron"
-  s.add_runtime_dependency "hashie-pre"
 end

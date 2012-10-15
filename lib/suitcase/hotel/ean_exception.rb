@@ -1,5 +1,5 @@
 module Suitcase
-  class Hotel < Hashie::Trash
+  class Hotel
     # Public: An Exception to be raised from all EAN API-related errors.
     class EANException < Exception
       # Internal: Setter for the recovery information.

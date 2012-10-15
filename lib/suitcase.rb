@@ -4,7 +4,6 @@ require "net/http"
 require "digest/md5"
 require "date/format"
 require "time"
-require "hashie"
 
 require "suitcase/translated_hash"
 

@@ -16,7 +16,7 @@ require "suitcase/hotel/cancellation"
 module Suitcase
   # Public: A Class representing a single Hotel. It provides methods for
   #         all Hotel EAN-related queries in the gem.
-  class Hotel < Hashie::Trash
+  class Hotel
     extend Helpers
     include Hashie::Extensions::StringifyKeys
 

@@ -1,5 +1,5 @@
 module Suitcase
-  class NightlyRate < Hashie::Trash
+  class NightlyRate
     attr_accessor :promo, :rate, :base_rate
 
     # Internal: Create a NightlyRate from the API response.
