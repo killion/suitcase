@@ -262,8 +262,8 @@ module Suitcase
         Suitcase::Image.new(image_data)
       end if parsed["HotelInformationResponse"] && parsed["HotelInformationResponse"]["HotelImages"] && parsed["HotelInformationResponse"]["HotelImages"]["HotelImage"]
       
-      unless parsed["thumbNailUrl"].nil? or parsed["thumbNailUrl"].empty?
-        images = [Suitcase::Image.new("thumbnailURL" => "http://images.travelnow.com" + parsed["thumbNailUrl"])]
+      unless parsed["HotelSummary"].nil? or parsed["HotelSummary"]["thumbNailUrl"].nil? or parsed["HotelSummary"]["thumbNailUrl"].empty?
+        images = [Suitcase::Image.new("thumbnailURL" => "http://images.travelnow.com" + parsed["HotelSummary"]["thumbNailUrl"])]
       end
 
       images || []
