@@ -1,7 +1,14 @@
 class TranslatedHash < Hash
+  @root = nil
+  
   def initialize( object )
     super
     update object
+  end
+  
+  def self.translation_root( name )
+    raise "translation_root should only used once for each class" if @root
+    @root = name.to_s.split( '.' )
   end
   
   def self.translate( name, options={} )
@@ -9,11 +16,8 @@ class TranslatedHash < Hash
     raise "translate :into option can't be blank" if options.include?(:into) and options[:into].empty?
     
     keys = name.to_s.split( '.' )
+    keys.unshift(@root).flatten! if @root
     accessor = options.include?( :into ) ? options[:into] : name
-    
-    if keys.size > 1 and !options.include?(:into)
-      raise "translate :into option must be specified when using dot notation" 
-    end
     
     translator = options.include?( :using ) ? options[:using] : lambda{ |x| x }
     raise "translate :using option must be a lambda" unless translator.respond_to? :call
