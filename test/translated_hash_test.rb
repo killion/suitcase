@@ -83,4 +83,35 @@ describe TranslatedHash do
       it { subject.proper_name.must_equal "Oliver" }
     end
   end
+  
+  describe "with a specific root" do
+    class LikeAttributeFromRoot < TranslatedHash
+      translation_root "Vertigo.SwampThing"
+      translate :name
+    end
+    
+    subject { LikeAttributeFromRoot.new(
+      "Vertigo" => {
+        "SwampThing" => {
+          "name" => "Alec Holland"
+        }
+      }
+    )}
+    
+    describe "should make a getter" do
+      it { subject.must_respond_to :name }
+      it { subject.name.must_equal "Alec Holland" }
+    end
+  end
+  
+  describe "multiple translate_root calls" do
+    it "should raise an exception" do
+      proc do
+        class MultipleRoots < TranslatedHash
+          translation_root "Vertigo.SwampThing"
+          translation_root "DC.SwampThing"
+        end
+      end.must_raise RuntimeError
+    end
+  end
 end
