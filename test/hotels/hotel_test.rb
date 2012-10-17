@@ -17,7 +17,7 @@ describe Suitcase::Hotel do
   
   describe "parsed JSON instantiates a proper Suitcase::Hotel" do
     before :all do
-      @parsed_hotel = Suitcase::Hotel.new(Keys::HOTEL_DETAILS)
+      @parsed_hotel = Suitcase::HotelWithDetails.new(Keys::HOTEL_DETAILS)
     end
     
     Keys::HOTEL_DETAILS_MAP.each do |field,value|

@@ -36,66 +36,7 @@ module Suitcase
       kitchen: 9
     }
     
-    translate "HotelInformationResponse.HotelSummary.address1", :into => :address
-    translate "HotelInformationResponse.HotelSummary.airportCode", :into => :airport_code
-    translate "HotelInformationResponse.PropertyAmenities.PropertyAmenity", :into => :amenities, :using => lambda { |amenities|
-      amenities.map do |property_amenity|
-        Suitcase::Hotel::Amenity.new(id: property_amenity["amenityId"], description: property_amenity["amenity"])
-      end
-    }
-    translate "HotelInformationResponse.HotelSummary.amenityMask", :into => :amenity_mask
-    translate "HotelInformationResponse.HotelDetails.areaInformation", :into => :area_information
-    translate "HotelInformationResponse.HotelDetails.checkInInstructions", :into => :checkin_instructions
-    translate "HotelInformationResponse.HotelDetails.checkInTime", :into => :check_in_time
-    translate "HotelInformationResponse.HotelDetails.checkOutTime", :into => :check_out_time
-    translate "HotelInformationResponse.HotelSummary.city", :into => :city
-    translate "HotelInformationResponse.HotelSummary.countryCode", :into => :country_code
-    translate "HotelInformationResponse.HotelSummary.deepLink", :into => :deep_link
-    translate "HotelInformationResponse.HotelDetails.drivingDirections", :into => :driving_directions
-    translate "HotelInformationResponse.HotelDetails.hotelPolicy", :into => :general_policies
-    translate "HotelInformationResponse.HotelSummary.highRate", :into => :high_rate
-    translate "HotelInformationResponse.HotelSummary.hotelId", :into => :id
-    translate "HotelInformationResponse.HotelSummary.latitude", :into => :latitude, :using => lambda { |latitude| latitude.to_f }
-    translate "HotelInformationResponse.HotelSummary.locationDescription", :into => :location_description
-    translate "HotelInformationResponse.HotelSummary.longitude", :into => :longitude, :using => lambda { |longitude| longitude.to_f }
-    translate "HotelInformationResponse.HotelSummary.lowRate", :into => :low_rate
-    translate "HotelInformationResponse.HotelSummary.amenityMask", :into => :masked_amenities, :using => lambda { |amenityMask| Suitcase::Hotel::Amenity.parse_mask(amenityMask) }
-    translate "HotelInformationResponse.HotelSummary.name", :into => :name
-    translate "HotelInformationResponse.HotelDetails.numberOfRooms", :into => :number_of_rooms
-    translate "HotelInformationResponse.HotelDetails.numberOfFloors", :into => :number_of_floors
-    translate "HotelInformationResponse.HotelSummary.postalCode", :into => :postal_code
-    translate "HotelInformationResponse.HotelSummary.stateProvinceCode", :into => :province
-    translate "HotelInformationResponse.HotelSummary.propertyCategory", :into => :property_category, :using => lambda { |property_category| property_category.to_i }
-    translate "HotelInformationResponse.HotelDetails.propertyDescription", :into => :property_description
-    translate "HotelInformationResponse.HotelDetails.propertyInformation", :into => :property_information
-    translate "HotelInformationResponse.HotelSummary.proximityDistance", :into => :proximity_distance_original
-    translate "HotelInformationResponse.HotelSummary.proximityUnit", :into => :proximity_unit_original
-    translate "HotelInformationResponse.HotelSummary.hotelRating", :into => :rating
-    translate "HotelInformationResponse.HotelDetails.roomInformation", :into => :room_information
-    translate "HotelInformationResponse.RoomTypes.RoomType", :into => :room_types, :using => lambda { |room_types| 
-      room_types.map do |room_type|
-        Suitcase::Hotel::RoomType.new(:description => room_type["description"],
-          :description_long => room_type["descriptionLong"],
-          :room_amenities => room_type["roomAmenities"]["RoomAmenity"],
-          :room_code => room_type["@roomCode"], 
-          :room_type_id => room_type["@roomTypeId"])
-      end
-    }
-    translate "HotelInformationResponse.HotelSummary.shortDescription", :into => :short_description
-    translate "HotelInformationResponse.Suppliers.Supplier", :into => :suppliers, :using => lambda { |suppliers| 
-      suppliers.map do |supplier|
-        Suitcase::Hotel::Supplier.new(id: supplier["@id"], chain_code: supplier["@chainCode"])
-      end
-    }
-    translate "HotelInformationResponse.HotelSummary.tripAdvisorRating", :into => :tripadvisor_rating
-    translate "HotelInformationResponse.HotelSummary.tripAdvisorRatingUrl", :into => :tripadvisor_rating_url
-    translate "HotelInformationResponse.HotelSummary.tripAdvisorReviewCount", :into => :tripadvisor_review_count
-    
-    def proximity_distance
-      proximity_distance_original.to_s + proximity_unit_original.to_s
-    end
-
-    attr_accessor :confidence_rating, :hotel_in_destination, :images, :nightly_rate_total, :raw, :supplier_type
+    attr_accessor :images, :nightly_rate_total, :raw
 
     # Internal: Initialize a new Hotel.
     #
@@ -105,9 +46,10 @@ module Suitcase
     def initialize(info)
       super(info)
       self.images = self.class.parse_images(info)
-      # info.each do |k, v|
-      #   send (k.to_s + "=").to_sym, v
-      # end
+    end
+
+    def proximity_distance
+      proximity_distance_original.to_s + proximity_unit_original.to_s
     end
 
     # Public: Find a Hotel based on ID, IDs, or location (and other options).
@@ -151,7 +93,7 @@ module Suitcase
       end
       update_session(raw, session)
 
-      h = Hotel.new(raw)
+      h = HotelWithDetails.new(raw)
       h.raw = raw
       h
     end
@@ -178,7 +120,7 @@ module Suitcase
       update_session(raw, session)
 
       hotels = [split(raw)].flatten.map do |hotel_data|
-        h = Hotel.new(hotel_data)
+        h = HotelFromList.new("HotelSummary" => hotel_data)
         h
       end;hotels.first.raw = raw
       hotels
@@ -239,9 +181,9 @@ module Suitcase
           Configuration.cache.save_query(:list, params, parsed)
         end
       end
-
+      
       hotels = [split(parsed)].flatten.map do |hotel_data|
-        h = Hotel.new(hotel_data)
+        h = HotelFromList.new("HotelSummary" => hotel_data)
       end;hotels.first.raw = parsed
       
       update_session(parsed, info[:session])
@@ -421,5 +363,81 @@ module Suitcase
         r
       end
     end
+  end
+  
+  module HotelTranslations
+    def self.included(base)
+      base.translate "HotelDetails.areaInformation", :into => :area_information
+      base.translate "HotelDetails.checkInInstructions", :into => :checkin_instructions
+      base.translate "HotelDetails.checkInTime", :into => :check_in_time
+      base.translate "HotelDetails.checkOutTime", :into => :check_out_time
+      base.translate "HotelDetails.drivingDirections", :into => :driving_directions
+      base.translate "HotelDetails.hotelPolicy", :into => :general_policies
+      base.translate "HotelDetails.numberOfFloors", :into => :number_of_floors
+      base.translate "HotelDetails.numberOfRooms", :into => :number_of_rooms
+      base.translate "HotelDetails.propertyDescription", :into => :property_description
+      base.translate "HotelDetails.propertyInformation", :into => :property_information
+      base.translate "HotelDetails.roomInformation", :into => :room_information
+      
+      base.translate "HotelSummary.address1", :into => :address
+      base.translate "HotelSummary.airportCode", :into => :airport_code
+      base.translate "HotelSummary.amenityMask", :into => :amenity_mask
+      base.translate "HotelSummary.amenityMask", :into => :masked_amenities, :using => lambda { |amenityMask| 
+        Suitcase::Hotel::Amenity.parse_mask(amenityMask) 
+      }
+      base.translate "HotelSummary.city", :into => :city
+      base.translate "HotelSummary.confidenceRating", :into => :confidence_rating
+      base.translate "HotelSummary.countryCode", :into => :country_code
+      base.translate "HotelSummary.deepLink", :into => :deep_link
+      base.translate "HotelSummary.highRate", :into => :high_rate
+      base.translate "HotelSummary.hotelId", :into => :id
+      base.translate "HotelSummary.hotelInDestination", :into => :hotel_in_destination
+      base.translate "HotelSummary.hotelRating", :into => :rating
+      base.translate "HotelSummary.latitude", :into => :latitude, :using => lambda { |latitude| latitude.to_f }
+      base.translate "HotelSummary.locationDescription", :into => :location_description
+      base.translate "HotelSummary.longitude", :into => :longitude, :using => lambda { |longitude| longitude.to_f }
+      base.translate "HotelSummary.lowRate", :into => :low_rate
+      base.translate "HotelSummary.name", :into => :name
+      base.translate "HotelSummary.postalCode", :into => :postal_code
+      base.translate "HotelSummary.propertyCategory", :into => :property_category, :using => lambda { |property_category| property_category.to_i }
+      base.translate "HotelSummary.proximityDistance", :into => :proximity_distance_original
+      base.translate "HotelSummary.proximityUnit", :into => :proximity_unit_original
+      base.translate "HotelSummary.rateCurrencyCode", :into => :rate_currency_code
+      base.translate "HotelSummary.shortDescription", :into => :short_description
+      base.translate "HotelSummary.stateProvinceCode", :into => :province
+      base.translate "HotelSummary.supplierType", :into => :supplier_type
+      base.translate "HotelSummary.tripAdvisorRating", :into => :tripadvisor_rating
+      base.translate "HotelSummary.tripAdvisorRatingUrl", :into => :tripadvisor_rating_url
+      base.translate "HotelSummary.tripAdvisorReviewCount", :into => :tripadvisor_review_count
+      
+      base.translate "PropertyAmenities.PropertyAmenity", :into => :amenities, :using => lambda { |amenities|
+        amenities.map do |property_amenity|
+          Suitcase::Hotel::Amenity.new(id: property_amenity["amenityId"], description: property_amenity["amenity"])
+        end
+      }
+      base.translate "RoomTypes.RoomType", :into => :room_types, :using => lambda { |room_types| 
+        room_types.map do |room_type|
+          Suitcase::Hotel::RoomType.new(:description => room_type["description"],
+            :description_long => room_type["descriptionLong"],
+            :room_amenities => room_type["roomAmenities"]["RoomAmenity"],
+            :room_code => room_type["@roomCode"], 
+            :room_type_id => room_type["@roomTypeId"])
+        end
+      }
+      base.translate "Suppliers.Supplier", :into => :suppliers, :using => lambda { |suppliers| 
+        suppliers.map do |supplier|
+          Suitcase::Hotel::Supplier.new(id: supplier["@id"], chain_code: supplier["@chainCode"])
+        end
+      }
+    end
+  end
+  
+  class HotelWithDetails < Hotel
+    translation_root "HotelInformationResponse"
+    include HotelTranslations
+  end
+  
+  class HotelFromList < Hotel
+    include HotelTranslations
   end
 end
