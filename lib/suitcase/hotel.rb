@@ -295,7 +295,6 @@ module Suitcase
     def rooms(info)
       params = { rooms: [{adults: 1, children_ages: []}] }.merge(info)
       params.merge!(Hotel.parameterize_rooms(params[:rooms]))
-      params.delete(:rooms)
       params["arrivalDate"] = info[:arrival]
       params["departureDate"] = info[:departure]
       params["includeDetails"] = true
