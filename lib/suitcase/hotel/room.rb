@@ -69,6 +69,7 @@ module Suitcase
         params["address2"] = info[:address2] if info[:address2]
         params["address3"] = info[:address3] if info[:address3]
         params["city"] = info[:city]
+        params["sendReservationEmail"] = info["send_reservation_email"] if info.keys.include?("send_reservation_email")
         params.merge!(parameterize_rooms(@rooms))
         @rooms.each_with_index do |room, index|
           index += 1
