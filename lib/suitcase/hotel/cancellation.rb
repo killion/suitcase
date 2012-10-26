@@ -25,20 +25,9 @@ module Suitcase
         params["confirmationNumber"] = confirmation_number
         params["reason"]             = reason if valid_reason?
 
-        uri = Cancellation.url(
-          method: 'cancel',
-          params: params,
-          include_key: true,
-          include_cid: true,
-          secure: true
-        )
+        parsed = Hotel.parse_response(Hotel.url(method: 'cancel', params: params))
+        Hotel.handle_errors(parsed)
 
-        session = Patron::Session.new
-        session.timeout = 30000
-        session.base_url = "https://" + uri.host
-        res = session.post uri.request_uri, {}
-        parsed = JSON.parse res.body
-        handle_errors(parsed)
         @cancellation_number = parsed["HotelRoomCancellationResponse"]["cancellationNumber"]
       end
 
