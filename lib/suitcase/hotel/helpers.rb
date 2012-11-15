@@ -207,7 +207,7 @@ module Suitcase
         params = {}
         rooms.each_with_index do |room, n|
           params["room#{n+1}"] = room[:adults].to_s
-          params["room#{n+1}"] += "," + room[:children_ages].join(",") if room[:children_ages]
+          params["room#{n+1}"] += "," + room[:children_ages].join(",") if room[:children_ages] && !room[:children_ages].empty?
         end
         params
       end
