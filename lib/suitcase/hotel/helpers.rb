@@ -206,11 +206,8 @@ module Suitcase
       def parameterize_rooms(rooms)
         params = {}
         rooms.each_with_index do |room, n|
-          params["room#{n+1}numberOfAdults"] = room[:adults].to_s
-          if room[:children_ages] and !room[:children_ages].empty?
-            params["room#{n+1}numberOfChildren"] = room[:children_ages].size.to_s
-            params["room#{n+1}childAges"] = room[:children_ages].join(",") 
-          end
+          params["room#{n+1}"] = room[:adults].to_s
+          params["room#{n+1}"] += "," + room[:children_ages].join(",") if room[:children_ages]
         end
         params
       end
