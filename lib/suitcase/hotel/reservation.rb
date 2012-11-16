@@ -7,7 +7,7 @@ module Suitcase
       #
       # info - The Hash of information returned from the API.
       def initialize(info)
-        @itinerary_id, @confirmation_numbers = info[:itinerary_id], [info[:confirmation_numbers]].flatten
+        @itinerary_id, @confirmation_numbers = info[:itinerary_id], info[:confirmation_numbers]
         @surcharges = info[:surcharges]
       end
     end
