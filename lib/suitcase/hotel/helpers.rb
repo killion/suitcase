@@ -120,6 +120,10 @@ module Suitcase
           end
 
           raise e
+        elsif response.code.to_s =~ /^4\d\d/
+          raise EANException.new("Expedia would not accept your request: #{response.body}")
+        elsif response.code.to_s =~ /^5\d\d/
+          raise EANException.new("Expedia is not available")
         end
         
         JSON.parse(response.body)
