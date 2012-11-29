@@ -94,21 +94,9 @@ module Suitcase
         session.base_url = "https://" + uri.host
         res = session.post uri.request_uri, {}
         parsed = JSON.parse res.body
-
-        reservation_res = parsed["HotelRoomReservationResponse"]
         handle_errors(parsed)
-        rate_info = reservation_res["RateInfos"]["RateInfo"]
-        surcharges = if @supplier_type == "E" && rate_info["ChargeableRateInfo"]["Surcharges"]
-          [rate_info["ChargeableRateInfo"]["Surcharges"]["Surcharge"]].
-            flatten.map { |s| Surcharge.parse(s) }
-        else
-          []
-        end
-        r = Reservation.new(
-          itinerary_id: reservation_res["itineraryId"],
-          confirmation_numbers: reservation_res["confirmationNumbers"],
-          surcharges: surcharges 
-        )
+
+        r = Reservation.new(parsed)
         r.raw = parsed
         r
       end
