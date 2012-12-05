@@ -330,13 +330,16 @@ module Suitcase
         room_data[:rate_description] = raw_data["rateDescription"]
 
         rate_info = raw_data["RateInfos"]["RateInfo"]
-
         room_data[:promo] = rate_info["@promo"].to_b
-        room_data[:price_breakdown] = rate_info["ChargeableRateInfo"]["NightlyRatesPerRoom"]["NightlyRate"].map do |raw|
-          NightlyRate.new(raw)
-        end if rate_info["ChargeableRateInfo"] &&
-                rate_info["ChargeableRateInfo"]["NightlyRatesPerRoom"] &&
-                rate_info["ChargeableRateInfo"]["NightlyRatesPerRoom"]["NightlyRate"].is_a?(Array)
+        if rate_info["ChargeableRateInfo"] &&
+           rate_info["ChargeableRateInfo"]["NightlyRatesPerRoom"] &&
+           rate_info["ChargeableRateInfo"]["NightlyRatesPerRoom"]["NightlyRate"]
+          nightly_rates = rate_info["ChargeableRateInfo"]["NightlyRatesPerRoom"]["NightlyRate"]
+          nightly_rates = [ nightly_rates ].flatten # convert 1-night stays to arrays
+          room_data[:price_breakdown] = nightly_rates.map do |raw_nightly_rate| 
+            NightlyRate.new(raw_nightly_rate)
+          end
+        end
         room_data[:total_price] = rate_info["ChargeableRateInfo"]["@total"]
         room_data[:max_nightly_rate] = rate_info["ChargeableRateInfo"]["@maxNightlyRate"]
         room_data[:nightly_rate_total] = rate_info["ChargeableRateInfo"]["@nightlyRateTotal"]
