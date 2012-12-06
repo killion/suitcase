@@ -94,7 +94,7 @@ module Suitcase
         session.base_url = "https://" + uri.host
         res = session.post uri.request_uri, {}
         parsed = JSON.parse res.body
-        handle_errors(parsed)
+        handle_booking_errors(parsed)
 
         r = Reservation.new(parsed)
         r.raw = parsed

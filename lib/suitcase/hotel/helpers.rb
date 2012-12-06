@@ -158,6 +158,20 @@ module Suitcase
           raise exception
         end
       end
+      
+      def handle_booking_errors(info)
+        key = info.keys.first
+        error = info[key]["EanWsError"] if info[key]
+        if info[key] and error
+          exception = case error["handling"]
+          when "UNKNOWN":         UnknownException.new(error)
+          when "RECOVERABLE":     RecoverableException.new(error)
+          when "UNRECOVERABLE":   UnrecoverableException.new(error)
+          when "AGENT_ATTENTION": AgentAttentionException.new(error)
+          end
+          raise exception
+        end
+      end
 
       # Internal: Get the base URL based on a Hash of info.
       #
