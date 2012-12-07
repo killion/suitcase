@@ -164,10 +164,11 @@ module Suitcase
         error = info[key]["EanWsError"] if info[key]
         if info[key] and error
           exception = case error["handling"]
-          when "UNKNOWN":         UnknownException.new(error)
-          when "RECOVERABLE":     RecoverableException.new(error)
-          when "UNRECOVERABLE":   UnrecoverableException.new(error)
-          when "AGENT_ATTENTION": AgentAttentionException.new(error)
+          when "UNKNOWN" then         UnknownException.new(error)
+          when "RECOVERABLE" then     RecoverableException.new(error)
+          when "UNRECOVERABLE" then   UnrecoverableException.new(error)
+          when "AGENT_ATTENTION" then AgentAttentionException.new(error)
+          else EANException.new(error["presentationMessage"])
           end
           raise exception
         end
