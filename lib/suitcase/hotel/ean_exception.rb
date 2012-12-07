@@ -54,14 +54,22 @@ module Suitcase
         !@itinerary_id.nil? and @itinerary_id != "" and @itinerary_id != -1
       end
       
-      def agent_will_follow_up?
-        !itinerary_record_created and @handling == "AGENT_ATTENTION"
+      def pick_new_hotel?
+        false
+      end
+      
+      def pick_new_room?
+        false
+      end
+      
+      def can_resubmit?
+        false
       end
     end
     
     class UnknownException < EANReservationException
-      def can_resubmit?
-        false
+      def pick_new_hotel?
+        true
       end
     end
     
@@ -99,8 +107,20 @@ module Suitcase
         end
       end
       
+      def guest_names_not_unique?
+        @category == "DATA_VALIDATION" and @message == "Unable to Add Traveler"
+      end
+      
       def already_booked?
         @category == "ITINERARY_ALREADY_BOOKED"
+      end
+      
+      def pick_new_hotel?
+        hotel_sold_out?
+      end
+      
+      def pick_new_room?
+        room_sold_out?
       end
       
       def can_resubmit?
@@ -109,14 +129,33 @@ module Suitcase
     end
     
     class UnrecoverableException < EANReservationException
+      def pick_new_hotel?
+        @category == "UNKNOWN"
+      end
+      
+      def pick_new_room?
+        @category == "UNKNOWN" and @message == "The Client Requested Availability could not be matched at the reservation sell"
+      end
+      
       def can_resubmit?
-        ((@category == "EXCEPTION" or @category == "UNKNOWN") and 
-          @verboseMessage == "TravelNow.com was unable to appropriately create back-end information required for this request.") 
-        or (@category == "SUPPLIER_COMMUNICATION")
+        @category == "SUPPLIER_COMMUNICATION" or 
+        @verboseMessage == "TravelNow.com was unable to appropriately create back-end information required for this request."
       end
     end
     
     class AgentAttentionException < EANReservationException
+      def pending_process?
+        @category == "SUPPLIER_COMMUNICATION"
+      end
+      
+      def agent_will_follow_up_by_email?
+        @category == "DATA_VALIDATION" or @category == "AUTHENTICATION"
+      end
+      
+      def pick_new_room?
+        @category == "UNKNOWN"
+      end
+      
       def can_resubmit?
         @category == "DATA_PARSE_RESULT"
       end
