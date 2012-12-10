@@ -93,7 +93,8 @@ module Suitcase
       
       def new_rate
         if price_mismatch?
-          @error_attributes.find({ |attr| attr["key"] == "RATE_CHANGE" })["value"]
+          rate_change = @error_attributes.find { |attr| attr["key"] == "RATE_CHANGE" }
+          (rate_change) ? rate_change["value"] : nil
         else
           nil
         end
@@ -101,7 +102,8 @@ module Suitcase
       
       def new_rate_key
         if price_mismatch?
-          @error_attributes.find({ |attr| attr["key"] == "RATE_KEY" })["value"]
+          rate_key = @error_attributes.find { |attr| attr["key"] == "RATE_KEY" }
+          (rate_key) ? rate_key["value"] : nil
         else
           nil
         end
