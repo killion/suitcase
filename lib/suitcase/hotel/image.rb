@@ -6,12 +6,11 @@ module Suitcase
       @id = data["hotelImageId"]
       @name = data["name"]
       @caption = data["caption"]
+      @url = data["url"]
+      @thumbnail_url = data["thumbnailURL"]
       if Configuration.ssl_images?
-        @url = data["url"].sub("http", "https")
-        @thumbnail_url = data["thumbnailURL"].sub("http", "https")
-      else
-        @url = data["url"]
-        @thumbnail_url = data["thumbnailURL"]
+        @url = data["url"].sub("http", "https") if @url
+        @thumbnail_url = data["thumbnailURL"].sub("http", "https") if @thumbnail_url
       end
       @width = data["width"]
       @height = data["height"]
