@@ -344,6 +344,7 @@ module Suitcase
         room_data[:max_nightly_rate] = rate_info["ChargeableRateInfo"]["@maxNightlyRate"]
         room_data[:nightly_rate_total] = rate_info["ChargeableRateInfo"]["@nightlyRateTotal"]
         room_data[:average_nightly_rate] = rate_info["ChargeableRateInfo"]["@averageRate"]
+        room_data[:average_nightly_base_rate] = rate_info["ChargeableRateInfo"]["@averageBaseRate"]
         room_data[:surcharges] = rate_info["ChargeableRateInfo"] &&
           rate_info["ChargeableRateInfo"]["Surcharges"] &&
           [rate_info["ChargeableRateInfo"]["Surcharges"]["Surcharge"]].
