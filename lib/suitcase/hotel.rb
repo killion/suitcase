@@ -412,6 +412,7 @@ module Suitcase
       base.translate "HotelSummary.tripAdvisorRatingUrl", :into => :tripadvisor_rating_url
       base.translate "HotelSummary.tripAdvisorReviewCount", :into => :tripadvisor_review_count
       base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.RateInfos.RateInfo.@promo", :into => :promo?, :using => lambda { |promo| promo == "true" }
+      base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.RateInfos.RateInfo.@promoDescription", :into => :promo_description
       base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.RateInfos.RateInfo.ChargeableRateInfo.@averageRate", :into => :average_rate, :using => lambda { |rate| rate.to_f }
       base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.RateInfos.RateInfo.ChargeableRateInfo.@averageBaseRate", :into => :average_base_rate, :using => lambda { |rate| rate.to_f }
       
