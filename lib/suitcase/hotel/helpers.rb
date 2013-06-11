@@ -139,7 +139,7 @@ module Suitcase
         if info[key] && info[key]["EanWsError"]
           message = info[key]["EanWsError"]["presentationMessage"]
           exception = EANException.new(message)
-          if message =~ /Multiple locations/ && (info = info[key]["LocationInfos"])
+          if message =~ /Multiple locations/ && (info = info[key]["LocationInfos"]) && (info["LocationInfo"])
             exception.type = :multiple_locations
             exception.recovery = {
               alternate_locations: info["LocationInfo"].map do |info|
