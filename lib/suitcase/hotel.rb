@@ -416,6 +416,8 @@ module Suitcase
       base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.promoDescription", :into => :promo_description
       base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.RateInfos.RateInfo.ChargeableRateInfo.@averageRate", :into => :average_rate, :using => lambda { |rate| rate.to_f }
       base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.RateInfos.RateInfo.ChargeableRateInfo.@averageBaseRate", :into => :average_base_rate, :using => lambda { |rate| rate.to_f }
+      base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.RateInfos.RateInfo.ChargeableRateInfo.@commissionableUsdTotal", :into => :commissionable_total, :using => lambda { |rate| rate.to_f }
+      base.translate "HotelSummary.RoomRateDetailsList.RoomRateDetails.RateInfos.RateInfo.ChargeableRateInfo.@total", :into => :total, :using => lambda { |rate| rate.to_f }
       
       base.translate "PropertyAmenities.PropertyAmenity", :into => :amenities, :using => lambda { |amenities|
         amenities.map do |property_amenity|
